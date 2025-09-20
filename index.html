@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="taskManagerApp">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Management System</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <script src="app.js"></script>
+</head>
+<body ng-controller="TaskController">
+
+    <div class="container">
+        <h1>Task Management System</h1>
+
+        <div class="task-input">
+            <input type="text" ng-model="newTask.name" placeholder="Task Name">
+            <textarea ng-model="newTask.description" placeholder="Task Description"></textarea>
+            <select ng-model="newTask.priority">
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+            <button ng-click="addTask()">Add Task</button>
+        </div>
+
+        <div class="task-list">
+            <h2>Tasks</h2>
+            <div class="task" ng-repeat="task in tasks">
+                <h3>{{task.name}} <span class="priority">{{task.priority}}</span></h3>
+                <p>{{task.description}}</p>
+                <button ng-click="editTask(task)">Edit</button>
+                <button ng-click="deleteTask(task)">Delete</button>
+            </div>
+        </div>
+
+        <div class="edit-task" ng-show="editing">
+            <h2>Edit Task</h2>
+            <input type="text" ng-model="editingTask.name">
+            <textarea ng-model="editingTask.description"></textarea>
+            <select ng-model="editingTask.priority">
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+            <button ng-click="updateTask()">Update Task</button>
+            <button ng-click="cancelEdit()">Cancel</button>
+        </div>
+    </div>
+
+</body>
+</html>
