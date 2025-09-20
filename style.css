@@ -80,3 +80,7 @@ h1, h2 {
     padding: 15px;
     border-radius: 6px;
 }
+.task-completed { background-color: #d4edda; text-decoration: line-through; }
+.task-high { border-left: 5px solid #dc3545; }
+.task-medium { border-left: 5px solid #ffc107; }
+.task-low { border-left: 5px solid #28a745; }
