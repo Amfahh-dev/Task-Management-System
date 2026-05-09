@@ -1,51 +1,746 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="taskManagerApp">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Task Management System</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
-    <script src="app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>TaskFlow Pro | Next-Gen Task Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(145deg, #0a0c12 0%, #0f111a 100%);
+            min-height: 100vh;
+            padding: 32px 24px;
+            color: #eef2ff;
+        }
+
+        /* Glassmorphic container */
+        .app-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header Section - SMASHED */
+        .hero-header {
+            text-align: center;
+            margin-bottom: 48px;
+            position: relative;
+        }
+
+        .hero-header h1 {
+            font-size: 64px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF 0%, #a855f7 40%, #f97316 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -1.5px;
+            text-shadow: 0 2px 10px rgba(168,85,247,0.2);
+            margin-bottom: 12px;
+        }
+
+        .hero-header p {
+            color: #94a3b8;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .stats-grid {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-top: 28px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: rgba(30, 34, 48, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 32px;
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+
+        .stat-card i { font-size: 28px; color: #f97316; }
+        .stat-card span { font-size: 28px; font-weight: 800; color: white; }
+        .stat-card small { font-size: 14px; color: #94a3b8; margin-left: 6px; }
+
+        /* Main Layout - smashed grid */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 28px;
+        }
+
+        /* Left Panel - Form + Filters */
+        .glass-panel {
+            background: rgba(18, 21, 33, 0.85);
+            backdrop-filter: blur(16px);
+            border-radius: 36px;
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 28px 24px;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
+        }
+
+        .glass-panel h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid #f97316;
+            padding-left: 16px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #a855f7;
+            margin-bottom: 8px;
+        }
+
+        .input-group input, .input-group textarea, .input-group select {
+            width: 100%;
+            background: #0f111a;
+            border: 1px solid #2d2f3e;
+            border-radius: 20px;
+            padding: 14px 18px;
+            font-size: 15px;
+            color: white;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus, .input-group textarea:focus, .input-group select:focus {
+            outline: none;
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249,115,22,0.2);
+        }
+
+        textarea { resize: vertical; min-height: 80px; }
+
+        .btn-primary {
+            background: linear-gradient(105deg, #f97316, #ea580c);
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 16px;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(249,115,22,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.02);
+            background: linear-gradient(105deg, #ea580c, #dc2626);
+            box-shadow: 0 8px 20px rgba(249,115,22,0.5);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            background: #1e2130;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .filter-chip.active {
+            background: #f97316;
+            color: white;
+            box-shadow: 0 2px 8px rgba(249,115,22,0.4);
+        }
+
+        .sort-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .sort-btn {
+            background: #1e2130;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 40px;
+            color: #cbd5e1;
+            font-weight: 500;
+            cursor: pointer;
+            flex: 1;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .sort-btn i { margin-right: 6px; }
+        .sort-btn:hover { background: #2d3042; color: white; }
+
+        /* Right Panel - Task List (SMASHED CARDS) */
+        .task-board {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .task-card {
+            background: linear-gradient(115deg, #141824 0%, #12151f 100%);
+            border-radius: 28px;
+            padding: 20px 24px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.25s ease;
+            animation: fadeSlideUp 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .task-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(249,115,22,0.4);
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.5);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .task-title {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: #2d2f42;
+        }
+
+        .priority-high { background: #dc2626; color: white; box-shadow: 0 0 6px #dc2626; }
+        .priority-medium { background: #f59e0b; color: #1e1b10; }
+        .priority-low { background: #10b981; color: white; }
+
+        .status-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #1e2130;
+            padding: 6px 14px;
+            border-radius: 60px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: 0.1s;
+        }
+
+        .status-toggle.completed {
+            background: #10b98120;
+            color: #34d399;
+            border: 1px solid #10b98140;
+        }
+
+        .task-desc {
+            color: #9ca3af;
+            margin: 12px 0 16px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .task-meta i { margin-right: 6px; color: #f97316; }
+
+        .task-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            border-top: 1px solid #252837;
+            padding-top: 16px;
+            margin-top: 6px;
+        }
+
+        .task-actions button {
+            background: transparent;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .edit-btn { color: #60a5fa; background: #1e2a3a; }
+        .edit-btn:hover { background: #3b4b62; color: white; }
+        .delete-btn { color: #f87171; background: #2a1a1f; }
+        .delete-btn:hover { background: #dc2626; color: white; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(30,34,48,0.5);
+            border-radius: 48px;
+            backdrop-filter: blur(8px);
+        }
+
+        .empty-state i { font-size: 64px; color: #475569; margin-bottom: 20px; }
+
+        /* Edit modal overlay smashed */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-card {
+            background: #171b29;
+            border-radius: 48px;
+            max-width: 500px;
+            width: 90%;
+            padding: 32px;
+            border: 1px solid #f9731640;
+            box-shadow: 0 25px 40px black;
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 900px) {
+            .dashboard { grid-template-columns: 1fr; }
+            body { padding: 20px 16px; }
+            .hero-header h1 { font-size: 44px; }
+        }
+    </style>
 </head>
-<body ng-controller="TaskController">
-
-    <div class="container">
-        <h1>Task Management System</h1>
-
-        <div class="task-input">
-            <input type="text" ng-model="newTask.name" placeholder="Task Name">
-            <textarea ng-model="newTask.description" placeholder="Task Description"></textarea>
-            <select ng-model="newTask.priority">
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-            </select>
-            <button ng-click="addTask()">Add Task</button>
-        </div>
-
-        <div class="task-list">
-            <h2>Tasks</h2>
-            <div class="task" ng-repeat="task in tasks">
-                <h3>{{task.name}} <span class="priority">{{task.priority}}</span></h3>
-                <p>{{task.description}}</p>
-                <button ng-click="editTask(task)">Edit</button>
-                <button ng-click="deleteTask(task)">Delete</button>
-            </div>
-        </div>
-
-        <div class="edit-task" ng-show="editing">
-            <h2>Edit Task</h2>
-            <input type="text" ng-model="editingTask.name">
-            <textarea ng-model="editingTask.description"></textarea>
-            <select ng-model="editingTask.priority">
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-            </select>
-            <button ng-click="updateTask()">Update Task</button>
-            <button ng-click="cancelEdit()">Cancel</button>
+<body>
+<div class="app-wrapper">
+    <!-- Hero smashed area -->
+    <div class="hero-header">
+        <h1><i class="fas fa-bolt"></i> TaskFlow Pro</h1>
+        <p>smash your productivity • insane speed • sleek design</p>
+        <div class="stats-grid" id="statsContainer">
+            <div class="stat-card"><i class="fas fa-tasks"></i><span id="totalTasks">0</span><small>total</small></div>
+            <div class="stat-card"><i class="fas fa-check-circle"></i><span id="completedTasks">0</span><small>done</small></div>
+            <div class="stat-card"><i class="fas fa-hourglass-half"></i><span id="pendingTasks">0</span><small>pending</small></div>
         </div>
     </div>
 
+    <div class="dashboard">
+        <!-- LEFT PANEL - ADD TASK + FILTER -->
+        <div class="glass-panel">
+            <h3><i class="fas fa-plus-circle"></i> Create New Task</h3>
+            <div class="input-group">
+                <label>Task Title</label>
+                <input type="text" id="taskTitle" placeholder="e.g., Build killer dashboard..." autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label>Description</label>
+                <textarea id="taskDesc" placeholder="Write something productive..."></textarea>
+            </div>
+            <div class="input-group">
+                <label>Priority</label>
+                <select id="taskPriority">
+                    <option value="High">🔥 HIGH - Critical</option>
+                    <option value="Medium" selected>📌 MEDIUM - Normal</option>
+                    <option value="Low">💤 LOW - Chill</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Due Date</label>
+                <input type="date" id="taskDueDate">
+            </div>
+            <button class="btn-primary" id="addTaskBtn"><i class="fas fa-bolt"></i> ADD TASK — SMASH IT</button>
+
+            <div style="margin-top: 32px;">
+                <h3><i class="fas fa-filter"></i> Smart Filters</h3>
+                <div class="filter-bar" id="filterGroup">
+                    <div class="filter-chip active" data-filter="all">All Tasks</div>
+                    <div class="filter-chip" data-filter="Pending">Pending</div>
+                    <div class="filter-chip" data-filter="Completed">Completed</div>
+                </div>
+                <div class="sort-buttons">
+                    <button class="sort-btn" data-sort="date"><i class="far fa-calendar-alt"></i> Due Date</button>
+                    <button class="sort-btn" data-sort="priority"><i class="fas fa-arrow-up"></i> Priority</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL - TASK LIST -->
+        <div class="task-board" id="taskListContainer">
+            <!-- dynamic tasks injected -->
+            <div class="empty-state">
+                <i class="fas fa-rocket"></i>
+                <h3>No tasks yet!</h3>
+                <p>Create a task above and dominate your day.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT MODAL (SMASHED) -->
+<div id="editModal" class="modal-overlay">
+    <div class="modal-card">
+        <h3 style="margin-bottom: 20px; display: flex; gap:8px;"><i class="fas fa-pen-fancy"></i> Edit Task</h3>
+        <input type="text" id="editTaskId" hidden>
+        <div class="input-group"><label>Title</label><input type="text" id="editTitle" placeholder="Task name"></div>
+        <div class="input-group"><label>Description</label><textarea id="editDesc" rows="3"></textarea></div>
+        <div class="input-group"><label>Priority</label><select id="editPriority"><option>High</option><option>Medium</option><option>Low</option></select></div>
+        <div class="input-group"><label>Due Date</label><input type="date" id="editDueDate"></div>
+        <div style="display: flex; gap: 12px; margin-top: 24px;">
+            <button class="btn-primary" id="confirmEditBtn" style="background: linear-gradient(105deg,#3b82f6,#2563eb);">Update Task</button>
+            <button id="closeModalBtn" style="background:#2d2f42; border:none; border-radius:40px; padding:12px; color:white; cursor:pointer;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- SMASHED TASK MANAGER ----------
+    let tasks = [];
+    let currentFilter = "all";
+    let currentSort = "date"; // date or priority
+    let sortReverse = false;
+
+    // DOM Elements
+    const taskContainer = document.getElementById("taskListContainer");
+    const addBtn = document.getElementById("addTaskBtn");
+    const totalSpan = document.getElementById("totalTasks");
+    const completedSpan = document.getElementById("completedTasks");
+    const pendingSpan = document.getElementById("pendingTasks");
+    const filterChips = document.querySelectorAll(".filter-chip");
+    const sortBtns = document.querySelectorAll(".sort-btn");
+    const modal = document.getElementById("editModal");
+    const editTitle = document.getElementById("editTitle");
+    const editDesc = document.getElementById("editDesc");
+    const editPriority = document.getElementById("editPriority");
+    const editDueDate = document.getElementById("editDueDate");
+    const editTaskIdHidden = document.getElementById("editTaskId");
+    const confirmEditBtn = document.getElementById("confirmEditBtn");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+
+    // Load from localStorage
+    function loadTasks() {
+        const stored = localStorage.getItem("smash_tasks");
+        if(stored) {
+            tasks = JSON.parse(stored);
+        } else {
+            // Preload 3 epic tasks to show off smashed UI
+            tasks = [
+                { id: "1", title: "Design new dashboard UI", description: "Create glassmorphic cards with blazing animation", priority: "High", status: "Pending", dueDate: "2026-05-20", createdAt: Date.now() },
+                { id: "2", title: "Implement task filters", description: "Add sorting by due date and priority", priority: "Medium", status: "Completed", dueDate: "2026-05-18", createdAt: Date.now() },
+                { id: "3", title: "Deploy to production", description: "Make sure everything is smashed ✨", priority: "High", status: "Pending", dueDate: "2026-05-25", createdAt: Date.now() }
+            ];
+        }
+        renderStats();
+        renderTasks();
+        saveToLocal();
+    }
+
+    function saveToLocal() { localStorage.setItem("smash_tasks", JSON.stringify(tasks)); }
+
+    function renderStats() {
+        const total = tasks.length;
+        const completed = tasks.filter(t => t.status === "Completed").length;
+        const pending = total - completed;
+        totalSpan.innerText = total;
+        completedSpan.innerText = completed;
+        pendingSpan.innerText = pending;
+    }
+
+    // Sorting logic
+    function getPriorityWeight(p) {
+        if(p === "High") return 3;
+        if(p === "Medium") return 2;
+        return 1;
+    }
+
+    function sortTasks(taskArray) {
+        return [...taskArray].sort((a,b) => {
+            if(currentSort === "date") {
+                let dateA = a.dueDate ? new Date(a.dueDate) : new Date(8640000000000000);
+                let dateB = b.dueDate ? new Date(b.dueDate) : new Date(8640000000000000);
+                if(isNaN(dateA)) dateA = new Date(8640000000000000);
+                if(isNaN(dateB)) dateB = new Date(8640000000000000);
+                return sortReverse ? dateB - dateA : dateA - dateB;
+            } else if(currentSort === "priority") {
+                let weightDiff = getPriorityWeight(b.priority) - getPriorityWeight(a.priority);
+                return sortReverse ? -weightDiff : weightDiff;
+            }
+            return 0;
+        });
+    }
+
+    function renderTasks() {
+        let filtered = tasks.filter(task => {
+            if(currentFilter === "all") return true;
+            return task.status === currentFilter;
+        });
+        const sorted = sortTasks(filtered);
+        
+        if(sorted.length === 0) {
+            taskContainer.innerHTML = `<div class="empty-state"><i class="fas fa-smile-wink"></i><h3>No tasks match</h3><p>Create a new task or change filters</p></div>`;
+            return;
+        }
+        
+        taskContainer.innerHTML = "";
+        sorted.forEach(task => {
+            const card = document.createElement("div");
+            card.className = "task-card";
+            const priorityClass = task.priority === "High" ? "priority-high" : (task.priority === "Medium" ? "priority-medium" : "priority-low");
+            const dueDisplay = task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-US') : "No due date";
+            const statusText = task.status === "Completed" ? "✅ Completed" : "⏳ Pending";
+            const statusClass = task.status === "Completed" ? "completed" : "";
+            
+            card.innerHTML = `
+                <div class="task-header">
+                    <div class="task-title">
+                        <strong>${escapeHtml(task.title)}</strong>
+                        <span class="priority-badge ${priorityClass}">${task.priority}</span>
+                    </div>
+                    <div class="status-toggle ${statusClass}" data-id="${task.id}" data-status="${task.status}">
+                        <i class="${task.status === 'Completed' ? 'fas fa-check-circle' : 'far fa-circle'}"></i>
+                        <span>${statusText}</span>
+                    </div>
+                </div>
+                <div class="task-desc">${escapeHtml(task.description) || "✨ No description added."}</div>
+                <div class="task-meta">
+                    <span><i class="fas fa-calendar-day"></i> Due: ${dueDisplay}</span>
+                    <span><i class="fas fa-clock"></i> Created: ${new Date(task.createdAt || Date.now()).toLocaleDateString()}</span>
+                </div>
+                <div class="task-actions">
+                    <button class="edit-btn" data-id="${task.id}"><i class="fas fa-edit"></i> Edit</button>
+                    <button class="delete-btn" data-id="${task.id}"><i class="fas fa-trash-alt"></i> Delete</button>
+                </div>
+            `;
+            taskContainer.appendChild(card);
+        });
+        
+        // Attach event listeners for toggle, edit, delete
+        document.querySelectorAll(".status-toggle").forEach(el => {
+            el.addEventListener("click", (e) => {
+                const id = el.getAttribute("data-id");
+                const currentStat = el.getAttribute("data-status");
+                const newStatus = currentStat === "Pending" ? "Completed" : "Pending";
+                const taskIdx = tasks.findIndex(t => t.id === id);
+                if(taskIdx !== -1) {
+                    tasks[taskIdx].status = newStatus;
+                    saveToLocal();
+                    renderStats();
+                    renderTasks();
+                    showFlyingToast(`Task marked ${newStatus}`);
+                }
+                e.stopPropagation();
+            });
+        });
+        
+        document.querySelectorAll(".edit-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const id = btn.getAttribute("data-id");
+                const task = tasks.find(t => t.id === id);
+                if(task) {
+                    editTaskIdHidden.value = task.id;
+                    editTitle.value = task.title;
+                    editDesc.value = task.description || "";
+                    editPriority.value = task.priority;
+                    editDueDate.value = task.dueDate || "";
+                    modal.classList.add("active");
+                }
+                e.stopPropagation();
+            });
+        });
+        
+        document.querySelectorAll(".delete-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const id = btn.getAttribute("data-id");
+                tasks = tasks.filter(t => t.id !== id);
+                saveToLocal();
+                renderStats();
+                renderTasks();
+                showFlyingToast("Task obliterated 💥");
+                e.stopPropagation();
+            });
+        });
+    }
+    
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+    
+    function generateId() { return Date.now() + '-' + Math.random().toString(36).substr(2, 6); }
+    
+    function addNewTask() {
+        const title = document.getElementById("taskTitle").value.trim();
+        if(!title) {
+            showFlyingToast("❌ Task title required!");
+            return;
+        }
+        const desc = document.getElementById("taskDesc").value;
+        const priority = document.getElementById("taskPriority").value;
+        let dueDate = document.getElementById("taskDueDate").value;
+        
+        const newTask = {
+            id: generateId(),
+            title: title,
+            description: desc,
+            priority: priority,
+            status: "Pending",
+            dueDate: dueDate,
+            createdAt: Date.now()
+        };
+        tasks.unshift(newTask); // newest on top
+        saveToLocal();
+        renderStats();
+        renderTasks();
+        // Reset form
+        document.getElementById("taskTitle").value = "";
+        document.getElementById("taskDesc").value = "";
+        document.getElementById("taskPriority").value = "Medium";
+        document.getElementById("taskDueDate").value = "";
+        showFlyingToast("🚀 Task smashed! Added to board.");
+    }
+    
+    function updateTaskFromModal() {
+        const id = editTaskIdHidden.value;
+        const newTitle = editTitle.value.trim();
+        if(!newTitle) { showFlyingToast("Title needed!"); return; }
+        const taskIndex = tasks.findIndex(t => t.id === id);
+        if(taskIndex !== -1) {
+            tasks[taskIndex].title = newTitle;
+            tasks[taskIndex].description = editDesc.value;
+            tasks[taskIndex].priority = editPriority.value;
+            tasks[taskIndex].dueDate = editDueDate.value;
+            saveToLocal();
+            renderStats();
+            renderTasks();
+            modal.classList.remove("active");
+            showFlyingToast("Task updated 🔥");
+        }
+    }
+    
+    function showFlyingToast(msg) {
+        let toast = document.createElement("div");
+        toast.innerText = msg;
+        toast.style.position = "fixed";
+        toast.style.bottom = "30px";
+        toast.style.left = "50%";
+        toast.style.transform = "translateX(-50%)";
+        toast.style.backgroundColor = "#1e293b";
+        toast.style.color = "#f97316";
+        toast.style.padding = "14px 28px";
+        toast.style.borderRadius = "60px";
+        toast.style.fontWeight = "bold";
+        toast.style.zIndex = "9999";
+        toast.style.backdropFilter = "blur(12px)";
+        toast.style.border = "1px solid #f97316";
+        toast.style.fontSize = "14px";
+        toast.style.boxShadow = "0 8px 24px black";
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = "0"; setTimeout(() => toast.remove(), 300); }, 2000);
+    }
+    
+    // Filter & sort handlers
+    filterChips.forEach(chip => {
+        chip.addEventListener("click", () => {
+            filterChips.forEach(c => c.classList.remove("active"));
+            chip.classList.add("active");
+            currentFilter = chip.getAttribute("data-filter");
+            renderTasks();
+        });
+    });
+    
+    sortBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const sortType = btn.getAttribute("data-sort");
+            if(currentSort === sortType) {
+                sortReverse = !sortReverse;
+            } else {
+                currentSort = sortType;
+                sortReverse = false;
+            }
+            renderTasks();
+        });
+    });
+    
+    addBtn.addEventListener("click", addNewTask);
+    confirmEditBtn.addEventListener("click", updateTaskFromModal);
+    closeModalBtn.addEventListener("click", () => modal.classList.remove("active"));
+    // close modal on overlay click
+    modal.addEventListener("click", (e) => { if(e.target === modal) modal.classList.remove("active"); });
+    
+    // press enter to add task fast
+    document.getElementById("taskTitle").addEventListener("keypress", (e) => { if(e.key === "Enter") addNewTask(); });
+    
+    loadTasks();
+</script>
 </body>
 </html>
